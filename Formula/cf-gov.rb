@@ -1,0 +1,47 @@
+class CfGov < Formula
+  desc "Chainflip governance transaction submission tool"
+  homepage "https://github.com/chainflip-io/cf-gov-js"
+  version "0.1.0"
+  license "MIT"
+
+  on_macos do
+    on_arm do
+      url "https://github.com/chainflip-io/cf-gov-js/releases/download/v#{version}/cf-gov-darwin-arm64"
+      sha256 "PLACEHOLDER"
+    end
+    on_intel do
+      url "https://github.com/chainflip-io/cf-gov-js/releases/download/v#{version}/cf-gov-darwin-x64"
+      sha256 "PLACEHOLDER"
+    end
+  end
+
+  on_linux do
+    on_arm do
+      url "https://github.com/chainflip-io/cf-gov-js/releases/download/v#{version}/cf-gov-linux-arm64"
+      sha256 "PLACEHOLDER"
+    end
+    on_intel do
+      url "https://github.com/chainflip-io/cf-gov-js/releases/download/v#{version}/cf-gov-linux-x64"
+      sha256 "PLACEHOLDER"
+    end
+  end
+
+  def install
+    binary_name = "cf-gov-darwin-arm64"  # Default, overridden by conditionals
+
+    on_macos do
+      on_arm { binary_name = "cf-gov-darwin-arm64" }
+      on_intel { binary_name = "cf-gov-darwin-x64" }
+    end
+    on_linux do
+      on_arm { binary_name = "cf-gov-linux-arm64" }
+      on_intel { binary_name = "cf-gov-linux-x64" }
+    end
+
+    bin.install binary_name => "cf-gov"
+  end
+
+  test do
+    system "#{bin}/cf-gov", "--help"
+  end
+end

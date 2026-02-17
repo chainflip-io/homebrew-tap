@@ -1,0 +1,102 @@
+name: Update Homebrew Formula
+
+on:
+    workflow_dispatch:
+        inputs:
+            formula:
+                description: "Formula to update"
+                required: true
+                type: choice
+                options:
+                    - cf-gov
+                    - cf-trezor-signer
+            version:
+                description: "New version number (e.g., 1.2.3)"
+                required: true
+
+jobs:
+    update-formula:
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write
+
+        env:
+            FORMULA: ${{ github.event.inputs.formula }}
+            VERSION: ${{ github.event.inputs.version }}
+            TAG: v${{ github.event.inputs.version }}
+
+        steps:
+            - name: Checkout homebrew-tap
+              uses: actions/checkout@v4
+              with:
+                  token: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Resolve source repository
+              id: repo
+              run: |
+                  declare -A REPOS=(
+                    ["cf-gov"]="chainflip-io/cf-gov-js"
+                    ["cf-trezor-signer"]="chainflip-io/cf-trezor-signer"
+                  )
+                  SOURCE_REPO="${REPOS[$FORMULA]}"
+                  if [[ -z "$SOURCE_REPO" ]]; then
+                    echo "::error::Unknown formula: $FORMULA"
+                    exit 1
+                  fi
+                  echo "source_repo=$SOURCE_REPO" >> "$GITHUB_OUTPUT"
+                  echo "Source repo: $SOURCE_REPO"
+
+            - name: Download release binaries and compute SHA256 hashes
+              id: hashes
+              run: |
+                  SOURCE_REPO="${{ steps.repo.outputs.source_repo }}"
+                  mkdir -p binaries && cd binaries
+
+                  TARGETS=("darwin-arm64" "darwin-x64" "linux-arm64" "linux-x64")
+
+                  for target in "${TARGETS[@]}"; do
+                    binary="${FORMULA}-${target}"
+                    echo "Downloading ${binary} from ${SOURCE_REPO} @ ${TAG}..."
+                    gh release download "$TAG" \
+                      --repo "$SOURCE_REPO" \
+                      --pattern "$binary"
+
+                    key="${target//-/_}"
+                    hash=$(sha256sum "$binary" | awk '{print $1}')
+                    echo "${key}=${hash}" >> "$GITHUB_OUTPUT"
+                    echo "  ${target}: ${hash}"
+                  done
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Update formula
+              run: |
+                  FORMULA_FILE="Formula/${FORMULA}.rb"
+
+                  # Update version (URLs use #{version} interpolation, so only this line needs changing)
+                  sed -i "s/version \".*\"/version \"${VERSION}\"/" "$FORMULA_FILE"
+
+                  # Update SHA256 hashes for each target
+                  declare -A SHAS=(
+                    ["darwin-arm64"]="${{ steps.hashes.outputs.darwin_arm64 }}"
+                    ["darwin-x64"]="${{ steps.hashes.outputs.darwin_x64 }}"
+                    ["linux-arm64"]="${{ steps.hashes.outputs.linux_arm64 }}"
+                    ["linux-x64"]="${{ steps.hashes.outputs.linux_x64 }}"
+                  )
+
+                  for target in "${!SHAS[@]}"; do
+                    # Update the sha256 on the line immediately following the URL for this target
+                    sed -i "/${FORMULA}-${target}\"/{ n; s/sha256 \"[^\"]*\"/sha256 \"${SHAS[$target]}\"/; }" "$FORMULA_FILE"
+                  done
+
+                  echo "Updated ${FORMULA_FILE}:"
+                  cat "$FORMULA_FILE"
+
+            - name: Commit and push changes
+              run: |
+                  git config user.name "github-actions[bot]"
+                  git config user.email "github-actions[bot]@users.noreply.github.com"
+                  git add "Formula/${FORMULA}.rb"
+                  git diff --cached --quiet && echo "No changes to commit" && exit 0
+                  git commit -m "Update ${FORMULA} to ${VERSION}"
+                  git push
