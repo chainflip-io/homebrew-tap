@@ -69,6 +69,23 @@ jobs:
               env:
                   GH_TOKEN: ${{ secrets.GH_RELEASE_TOKEN }}
 
+            - name: Create release on homebrew-tap and upload binaries
+              run: |
+                  cd binaries
+                  RELEASE_TAG="${FORMULA}-v${VERSION}"
+
+                  # Delete existing release if re-running for same version
+                  gh release delete "$RELEASE_TAG" --repo chainflip-io/homebrew-tap --yes 2>/dev/null || true
+                  git push origin --delete "$RELEASE_TAG" 2>/dev/null || true
+
+                  gh release create "$RELEASE_TAG" \
+                    --repo chainflip-io/homebrew-tap \
+                    --title "${FORMULA} ${VERSION}" \
+                    --notes "Binaries for ${FORMULA} v${VERSION}" \
+                    ${FORMULA}-*
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
             - name: Update formula
               run: |
                   FORMULA_FILE="Formula/${FORMULA}.rb"
