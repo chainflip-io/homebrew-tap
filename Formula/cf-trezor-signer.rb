@@ -1,7 +1,7 @@
 class CfTrezorSigner < Formula
   desc "Chainflip Trezor transaction signing tool"
   homepage "https://github.com/chainflip-io/cf-trezor-signer"
-  version "0.2.1"
+  version "0.2.4"
   license "MIT"
 
   on_macos do
