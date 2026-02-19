@@ -1,28 +1,28 @@
 class CfTrezorSigner < Formula
   desc "Chainflip Trezor transaction signing tool"
   homepage "https://github.com/chainflip-io/cf-trezor-signer"
-  version "0.2.4"
+  version "0.2.5"
   license "MIT"
 
   on_macos do
     on_arm do
       url "https://github.com/chainflip-io/homebrew-tap/releases/download/cf-trezor-signer-v#{version}/cf-trezor-signer-darwin-arm64"
-      sha256 "e919aefff38e9d82fa384b0015897a243e57762eafa2238cb658a3720891a342"
+      sha256 "5115a5d538c3f69e1122372b4e8d98d9f079dd26a167648f7bd4e31e56121216"
     end
     on_intel do
       url "https://github.com/chainflip-io/homebrew-tap/releases/download/cf-trezor-signer-v#{version}/cf-trezor-signer-darwin-x64"
-      sha256 "06a6d75130d02ad6cb8f31f464c4a565b8301a3358514d0cda7ba8a2a6f8fd06"
+      sha256 "e52f28ffe17b64068c2f717f39ca5476d225bc1694a0e62b6c4d5cb93cd28243"
     end
   end
 
   on_linux do
     on_arm do
       url "https://github.com/chainflip-io/homebrew-tap/releases/download/cf-trezor-signer-v#{version}/cf-trezor-signer-linux-arm64"
-      sha256 "66da9958c6c6cd8624d8cf458ce8fc8c9d66b51f3ea663ff64040aafb68010cb"
+      sha256 "0c3dfc0ad26b9bf5e740b78998aaf2127c22f5f16f2adaf159d04a7ea467baf1"
     end
     on_intel do
       url "https://github.com/chainflip-io/homebrew-tap/releases/download/cf-trezor-signer-v#{version}/cf-trezor-signer-linux-x64"
-      sha256 "dbe7f9ee541fd777a1b769f536625b67fb077c7ec5f79070524ea317bb34486b"
+      sha256 "f9cf0a88b4ba197335e1215f2a148a104fc8b0651a8ca766b76de26c609d7850"
     end
   end
 
