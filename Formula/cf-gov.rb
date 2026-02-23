@@ -1,28 +1,28 @@
 class CfGov < Formula
   desc "Chainflip governance transaction submission tool"
   homepage "https://github.com/chainflip-io/cf-gov-js"
-  version "0.3.3"
+  version "0.3.4"
   license "MIT"
 
   on_macos do
     on_arm do
       url "https://github.com/chainflip-io/homebrew-tap/releases/download/cf-gov-v#{version}/cf-gov-darwin-arm64"
-      sha256 "bcd008de19d17e6da91e48d12bf634a55164ec41e8aa99c31071371d2831eb02"
+      sha256 "55a6b9499f309eab748ece9cc4177c92864ea02c110c9eb8070678fa7e5c25e0"
     end
     on_intel do
       url "https://github.com/chainflip-io/homebrew-tap/releases/download/cf-gov-v#{version}/cf-gov-darwin-x64"
-      sha256 "9cf60c1d0b134f60b719d92f955977426921afd500a329b3fc0e54a01071af9f"
+      sha256 "6a47188b655a411550c3d7f8aee5c387ef6360e669a631749179eec8c1304e75"
     end
   end
 
   on_linux do
     on_arm do
       url "https://github.com/chainflip-io/homebrew-tap/releases/download/cf-gov-v#{version}/cf-gov-linux-arm64"
-      sha256 "6dbc0b82a49f20e56a5bfa85f46aebc0d906c1269657625a137646f9c1bc0c05"
+      sha256 "7555fbc782dbfb7b8b89594e32a8d2e471428c0429981966de65ca4ac402f793"
     end
     on_intel do
       url "https://github.com/chainflip-io/homebrew-tap/releases/download/cf-gov-v#{version}/cf-gov-linux-x64"
-      sha256 "59710ad1abcc01bef23e7a2bef048ad8c8d7e04adad381db5e15723324f15d98"
+      sha256 "e96c32d991f2347263b536680c10be1dd999a182e84ee31d9eb85642bbc68bc4"
     end
   end
 
