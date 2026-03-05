@@ -41,6 +41,17 @@ class CfGov < Formula
     bin.install binary_name => "cf-gov"
   end
 
+  def caveats
+    <<~EOS
+      cf-gov is a tool for submitting and approving Chainflip governance
+      proposals. Consider installing cf-trezor-signer too.
+
+      Quick start:
+        cf-gov config --chain=berghain   # Set up local config
+        cf-gov approve --chain=b         # Get a list of proposals and optionally approve
+    EOS
+  end
+
   test do
     system "#{bin}/cf-gov", "--help"
   end
