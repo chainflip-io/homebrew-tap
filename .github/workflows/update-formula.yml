@@ -27,13 +27,20 @@ jobs:
 
         steps:
             - name: Checkout homebrew-tap
-              uses: actions/checkout@v4
+              uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
               with:
                   token: ${{ secrets.GITHUB_TOKEN }}
 
             - name: Resolve source repository
               id: repo
               run: |
+                  # VERSION is substituted into the formula, so it must be a
+                  # plain version number and nothing else.
+                  if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+                    echo "::error::Version must look like 1.2.3, got: $VERSION"
+                    exit 1
+                  fi
+
                   declare -A REPOS=(
                     ["cf-gov"]="chainflip-io/cf-gov-js"
                     ["cf-trezor-signer"]="chainflip-io/cf-trezor-signer"
@@ -74,10 +81,10 @@ jobs:
                   cd binaries
                   RELEASE_TAG="${FORMULA}-v${VERSION}"
 
-                  # Delete existing release if re-running for same version
-                  gh release delete "$RELEASE_TAG" --repo chainflip-io/homebrew-tap --yes 2>/dev/null || true
-                  git push origin --delete "$RELEASE_TAG" 2>/dev/null || true
-
+                  # Fails if the release already exists: binaries people have
+                  # installed are never replaced under the same version. If a
+                  # run failed after this step, delete the release by hand
+                  # before re-running, or cut a new version.
                   gh release create "$RELEASE_TAG" \
                     --repo chainflip-io/homebrew-tap \
                     --title "${FORMULA} ${VERSION}" \
